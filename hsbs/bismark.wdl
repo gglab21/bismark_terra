@@ -196,6 +196,7 @@ task align {
   File r1_fastq
   File r2_fastq
   File genome_index
+  File target_region_bed
   File monitoring_script
   String samplename
 
@@ -269,6 +270,7 @@ task merge_replicates {
   File monitoring_script
   File chrom_sizes
   File genome_index
+  File target_region_bed
 
   String memory
   String disks
