@@ -87,7 +87,7 @@ task version_info {
 	>>>
 	runtime {
             continueOnReturnCode: false
-            docker: "goodneyga/bismark_terra:latest"
+            docker: "goodneyga/bismark_terra:v1.0"
             cpu: 1
             memory: "1GB"
         }
@@ -173,7 +173,7 @@ task trim {
 
   runtime {
   	continueOnReturnCode: false
-	docker: "goodneyga/bismark_terra:latest"
+	docker: "goodneyga/bismark_terra:v1.0"
 	memory: memory
     disks: disks
     cpu: cpu
@@ -240,7 +240,7 @@ task align {
 
   runtime {
   	continueOnReturnCode: false
-	docker: "goodneyga/bismark_terra:latest"
+	docker: "goodneyga/bismark_terra:v1.0"
 	memory: memory
     disks: disks
     cpu: cpu
@@ -332,7 +332,7 @@ task merge_replicates {
 
   runtime {
     continueOnReturnCode: false
-    docker: "goodneyga/bismark_terra:latest"
+    docker: "goodneyga/bismark_terra:v1.0"
     memory: memory
     disks: disks
     cpu: cpu
