@@ -46,6 +46,7 @@ workflow bsseq {
                             genome_index = genome_index,
                             samplename = samplename,
                             multicore = multicore,
+			    target_region_bed =target_region_bed,
                             monitoring_script = monitoring_script, memory = memory, disks = disks, cpu = cpu, preemptible = preemptible, image_id = image_id
         }
   }
@@ -58,6 +59,7 @@ workflow bsseq {
                                 assay_type = assay_type,
                                 chrom_sizes = chrom_sizes,
                                 genome_index = genome_index,
+				target_region_bed =target_region_bed,
                                 multicore = multicore,
                                 monitoring_script = monitoring_script, memory = memory, disks = disks, cpu = cpu, preemptible = preemptible, image_id = image_id
   }
@@ -221,7 +223,7 @@ task align {
     ln -s ${r2_fastq} r2.fastq.gz
 
     echo "Starting bismark"
-	bismark --genome bismark_index --multicore ${multicore} --phred33-quals -1 r1.fastq.gz -2 r2.fastq.gz  | tee -a log.txt
+    bismark --genome bismark_index --multicore ${multicore} --phred33-quals -1 r1.fastq.gz -2 r2.fastq.gz  | tee -a log.txt
 
     mv *bismark_bt2_pe.bam ${samplename}.bam
     mv *bismark_bt2_PE_report.txt ${samplename}_report.txt
@@ -230,9 +232,9 @@ task align {
     bismark2report --alignment_report ${samplename}_report.txt --output ${samplename}_bismark_report.html  | tee -a log.txt
 
     bedtools intersect -abam ${samplename}.bam -b ${target_region_bed} > ${samplename}.intersect.bam
-    rm ${samplename}.bam
+    #rm ${samplename}.bam
     samtools sort -o ${samplename}.intersect.sorted.bam -O bam -n ${samplename}.intersect.bam
-    rm ${samplename}.intersect.bam
+    #rm ${samplename}.intersect.bam
     samtools view -@ 8 -F 0x08 -b ${samplename}.intersect.sorted.bam > ${samplename}.intersect.sorted.paired.bam
 
 
@@ -296,7 +298,7 @@ task merge_replicates {
     tar zxf ${genome_index} -C bismark_index
 
     echo "Running samtools merge" | tee -a log.txt
-    samtools merge -n ${samplename}.bam ${sep=' ' bams}
+    samtools merge -n ${samplename}.intersect.sorted.paired.bam ${sep=' ' bams}
 
     if [ "${assay_type}" == "hsbs" ] || [ "${assay_type}" == "HSBS" ]; then
         echo "Deduplicating..." | tee -a log.txt
