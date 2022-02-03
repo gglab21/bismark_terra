@@ -232,25 +232,26 @@ task align {
     bismark2report --alignment_report ${samplename}_report.txt --output ${samplename}_bismark_report.html  | tee -a log.txt
 
     bedtools intersect -abam ${samplename}.bam -b ${target_region_bed} > ${samplename}.intersect.bam
-    #rm ${samplename}.bam
+    rm ${samplename}.bam
     samtools sort -o ${samplename}.intersect.sorted.bam -O bam -n ${samplename}.intersect.bam
-    #rm ${samplename}.intersect.bam
+    rm ${samplename}.intersect.bam
     samtools view -@ 8 -F 0x08 -b ${samplename}.intersect.sorted.bam > ${samplename}.intersect.sorted.paired.bam
+    mv ${samplename}.intersect.sorted.paired.bam ${samplename}.bam
 
 
   }
 
   runtime {
-  	continueOnReturnCode: false
-	docker: "goodneyga/bismark_terra:v1.0"
-	memory: memory
-    disks: disks
-    cpu: cpu
-    preemptible: preemptible
+  continueOnReturnCode: false
+  docker: "goodneyga/bismark_terra:v1.0"
+  memory: memory
+  disks: disks
+  cpu: cpu
+  preemptible: preemptible
  }
 
   output {
-    File bam = "${samplename}.intersect.sorted.paired.bam"
+    File bam = "${samplename}.bam"
     File output_report = "${samplename}_report.txt"
     File bismark_report_html = "${samplename}_bismark_report.html"
     File monitoring_log = "monitoring.log"
@@ -281,7 +282,7 @@ task merge_replicates {
 
   command {
 
-    # The file renaming below is necessary since this version of bismark doesn't allow the
+    # The file renaming below is necessary since this version of bismark doesn't allow the 
     # use of --multicore with --basename
     chmod u+x ${monitoring_script}
     ${monitoring_script} > monitoring.log &
@@ -292,29 +293,28 @@ task merge_replicates {
     cat ${sep=' ' align_logs} | tee -a log.txt
 
     echo -ne "\n\n### MERGE LOGS ###\n" | tee -a log.txt
-
+    
     echo "Using genome index: `basename ${genome_index}`" | tee -a log.txt
     mkdir bismark_index
     tar zxf ${genome_index} -C bismark_index
-
+    
     echo "Running samtools merge" | tee -a log.txt
-    samtools merge -n ${samplename}.intersect.sorted.paired.bam ${sep=' ' bams}
-
-    if [ "${assay_type}" == "hsbs" ] || [ "${assay_type}" == "HSBS" ]; then
+    samtools merge -n ${samplename}.bam ${sep=' ' bams}
+    
+    if [ "${assay_type}" == "wgbs" ] || [ "${assay_type}" == "WGBS" ]; then
         echo "Deduplicating..." | tee -a log.txt
-        #samtools sort -n -o ${samplename}.sorted_by_readname.bam ${samplename}.bam
-        deduplicate_bismark -p --bam ${samplename}.intersect.sorted.paired.bam
-        rm ${samplename}.intersect.sorted.paired.bam
-        mv ${samplename}.intersect.sorted.paired.deduplicated.bam ${samplename}.bam
+        samtools sort -n -o ${samplename}.sorted_by_readname.bam ${samplename}.bam 
+        deduplicate_bismark -p --bam ${samplename}.sorted_by_readname.bam
+        rm ${samplename}.sorted_by_readname.bam ${samplename}.bam
+        mv ${samplename}.sorted_by_readname.deduplicated.bam ${samplename}.bam
     else
         echo "Not deduplicating" | tee -a log.txt
     fi
-
+    
     samtools sort -o ${samplename}.sorted.bam ${samplename}.bam
     samtools index ${samplename}.sorted.bam ${samplename}.sorted.bai
-
+              
     bismark_methylation_extractor --multicore ${multicore} --gzip --bedGraph --buffer_size 50% --genome_folder bismark_index ${samplename}.bam
-
     TOTAL_READS=$(samtools view -F 4 ${samplename}.bam | wc -l | tr -d '[:space:]')
     echo "# total_reads=$TOTAL_READS" | tee ${samplename}_target_coverage.bed
     # How many reads overlap targets?
