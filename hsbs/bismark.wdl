@@ -275,6 +275,9 @@ task merge_replicates {
 
   command {
 
+    echo "Running samtools merge" | tee -a log.txt
+    samtools merge -n ${samplename}.bam ${sep=' ' bams}
+    
     TOTAL_READS=$(samtools view -F 4 ${samplename}.bam | wc -l | tr -d '[:space:]')
     echo "# total_reads=$TOTAL_READS" | tee ${samplename}_target_coverage.bed
     # How many reads overlap targets?
@@ -309,8 +312,7 @@ task merge_replicates {
     
     
     
-    echo "Running samtools merge" | tee -a log.txt
-    samtools merge -n ${samplename}.bam ${sep=' ' bams}
+    
     
     if [ "${assay_type}" == "hsbs" ] || [ "${assay_type}" == "HSBS" ]; then
         echo "Deduplicating..." | tee -a log.txt
