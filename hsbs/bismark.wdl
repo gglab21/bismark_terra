@@ -288,10 +288,10 @@ task merge_replicates {
     
     bedtools intersect -abam ${samplename}.bam -b ${target_region_bed} > ${samplename}.intersect.bam
     rm ${samplename}.bam
-    samtools sort -o ${samplename}.intersect.sorted.bam -O bam -n ${samplename}.intersect.bam
+    samtools sort -n -o ${samplename}.intersect.sorted.bam -O bam ${samplename}.intersect.bam
     rm ${samplename}.intersect.bam
     samtools view -@ 8 -F 0x08 -b ${samplename}.intersect.sorted.bam > ${samplename}.intersect.sorted.paired.bam
-    mv ${samplename}.intersect.sorted.paired.bam ${samplename}.bam
+    samtools sort -n -o ${samplename}.intersect.sorted.paired.bam -O bam  ${samplename}.bam
     
     # The file renaming below is necessary since this version of bismark doesn't allow the 
     # use of --multicore with --basename
