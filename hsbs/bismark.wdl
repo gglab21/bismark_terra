@@ -301,7 +301,7 @@ task merge_replicates {
     echo "Running samtools merge" | tee -a log.txt
     samtools merge -n ${samplename}.bam ${sep=' ' bams}
     
-    if [ "${assay_type}" == "wgbs" ] || [ "${assay_type}" == "WGBS" ]; then
+    if [ "${assay_type}" == "hsbs" ] || [ "${assay_type}" == "HSBS" ]; then
         echo "Deduplicating..." | tee -a log.txt
         samtools sort -n -o ${samplename}.sorted_by_readname.bam ${samplename}.bam 
         deduplicate_bismark -p --bam ${samplename}.sorted_by_readname.bam
