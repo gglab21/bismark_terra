@@ -1,6 +1,6 @@
 workflow bsseq {
 
-  String version = "v1.5"
+  String version = "v1.0"
 
   # 'dev' pipeline versions use the image with the 'latest' tag.
   # release pipeline versions use images tagged with the version number itself
@@ -275,6 +275,21 @@ task merge_replicates {
 
   command {
 
+    TOTAL_READS=$(samtools view -F 4 ${samplename}.bam | wc -l | tr -d '[:space:]')
+    echo "# total_reads=$TOTAL_READS" | tee ${samplename}_target_coverage.bed
+    # How many reads overlap targets?
+    READS_OVERLAPPING_TARGETS=$(bedtools intersect -u -bed -a ${samplename}.bam -b ${target_region_bed} | wc -l | tr -d '[:space:]')
+    echo "# reads_overlapping_targets=$READS_OVERLAPPING_TARGETS" | tee -a ${samplename}_target_coverage.bed
+    # How many reads per target?
+    bedtools intersect -c -a ${target_region_bed} -b ${samplename}.bam >> ${samplename}_target_coverage.bed
+    
+    bedtools intersect -abam ${samplename}.bam -b ${target_region_bed} > ${samplename}.intersect.bam
+    rm ${samplename}.bam
+    samtools sort -o ${samplename}.intersect.sorted.bam -O bam -n ${samplename}.intersect.bam
+    rm ${samplename}.intersect.bam
+    samtools view -@ 8 -F 0x08 -b ${samplename}.intersect.sorted.bam > ${samplename}.intersect.sorted.paired.bam
+    mv ${samplename}.intersect.sorted.paired.bam ${samplename}.bam
+    
     # The file renaming below is necessary since this version of bismark doesn't allow the 
     # use of --multicore with --basename
     chmod u+x ${monitoring_script}
@@ -291,20 +306,7 @@ task merge_replicates {
     mkdir bismark_index
     tar zxf ${genome_index} -C bismark_index
     
-    TOTAL_READS=$(samtools view -F 4 ${samplename}.bam | wc -l | tr -d '[:space:]')
-    echo "# total_reads=$TOTAL_READS" | tee ${samplename}_target_coverage.bed
-    # How many reads overlap targets?
-    READS_OVERLAPPING_TARGETS=$(bedtools intersect -u -bed -a ${samplename}.bam -b ${target_region_bed} | wc -l | tr -d '[:space:]')
-    echo "# reads_overlapping_targets=$READS_OVERLAPPING_TARGETS" | tee -a ${samplename}_target_coverage.bed
-    # How many reads per target?
-    bedtools intersect -c -a ${target_region_bed} -b ${samplename}.bam >> ${samplename}_target_coverage.bed
     
-    bedtools intersect -abam ${samplename}.bam -b ${target_region_bed} > ${samplename}.intersect.bam
-    rm ${samplename}.bam
-    samtools sort -o ${samplename}.intersect.sorted.bam -O bam -n ${samplename}.intersect.bam
-    rm ${samplename}.intersect.bam
-    samtools view -@ 8 -F 0x08 -b ${samplename}.intersect.sorted.bam > ${samplename}.intersect.sorted.paired.bam
-    mv ${samplename}.intersect.sorted.paired.bam ${samplename}.bam
     
     
     echo "Running samtools merge" | tee -a log.txt
