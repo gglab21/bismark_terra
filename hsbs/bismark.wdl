@@ -231,13 +231,6 @@ task align {
     echo "Starting bismark2report"
     bismark2report --alignment_report ${samplename}_report.txt --output ${samplename}_bismark_report.html  | tee -a log.txt
 
-    bedtools intersect -abam ${samplename}.bam -b ${target_region_bed} > ${samplename}.intersect.bam
-    rm ${samplename}.bam
-    samtools sort -o ${samplename}.intersect.sorted.bam -O bam -n ${samplename}.intersect.bam
-    rm ${samplename}.intersect.bam
-    samtools view -@ 8 -F 0x08 -b ${samplename}.intersect.sorted.bam > ${samplename}.intersect.sorted.paired.bam
-    mv ${samplename}.intersect.sorted.paired.bam ${samplename}.bam
-
 
   }
 
@@ -298,6 +291,22 @@ task merge_replicates {
     mkdir bismark_index
     tar zxf ${genome_index} -C bismark_index
     
+    TOTAL_READS=$(samtools view -F 4 ${samplename}.bam | wc -l | tr -d '[:space:]')
+    echo "# total_reads=$TOTAL_READS" | tee ${samplename}_target_coverage.bed
+    # How many reads overlap targets?
+    READS_OVERLAPPING_TARGETS=$(bedtools intersect -u -bed -a ${samplename}.bam -b ${target_region_bed} | wc -l | tr -d '[:space:]')
+    echo "# reads_overlapping_targets=$READS_OVERLAPPING_TARGETS" | tee -a ${samplename}_target_coverage.bed
+    # How many reads per target?
+    bedtools intersect -c -a ${target_region_bed} -b ${samplename}.bam >> ${samplename}_target_coverage.bed
+    
+    bedtools intersect -abam ${samplename}.bam -b ${target_region_bed} > ${samplename}.intersect.bam
+    rm ${samplename}.bam
+    samtools sort -o ${samplename}.intersect.sorted.bam -O bam -n ${samplename}.intersect.bam
+    rm ${samplename}.intersect.bam
+    samtools view -@ 8 -F 0x08 -b ${samplename}.intersect.sorted.bam > ${samplename}.intersect.sorted.paired.bam
+    mv ${samplename}.intersect.sorted.paired.bam ${samplename}.bam
+    
+    
     echo "Running samtools merge" | tee -a log.txt
     samtools merge -n ${samplename}.bam ${sep=' ' bams}
     
@@ -311,17 +320,11 @@ task merge_replicates {
         echo "Not deduplicating" | tee -a log.txt
     fi
     
-    samtools sort -o ${samplename}.sorted.bam ${samplename}.bam
+    samtools sort -n -o ${samplename}.sorted.bam ${samplename}.bam
     samtools index ${samplename}.sorted.bam ${samplename}.sorted.bai
               
     bismark_methylation_extractor --multicore ${multicore} --gzip --bedGraph --buffer_size 50% --genome_folder bismark_index ${samplename}.bam
-    TOTAL_READS=$(samtools view -F 4 ${samplename}.bam | wc -l | tr -d '[:space:]')
-    echo "# total_reads=$TOTAL_READS" | tee ${samplename}_target_coverage.bed
-    # How many reads overlap targets?
-    READS_OVERLAPPING_TARGETS=$(bedtools intersect -u -bed -a ${samplename}.bam -b ${target_region_bed} | wc -l | tr -d '[:space:]')
-    echo "# reads_overlapping_targets=$READS_OVERLAPPING_TARGETS" | tee -a ${samplename}_target_coverage.bed
-    # How many reads per target?
-    bedtools intersect -c -a ${target_region_bed} -b ${samplename}.bam >> ${samplename}_target_coverage.bed
+    
 
     gunzip "${samplename}.bedGraph.gz"
 
