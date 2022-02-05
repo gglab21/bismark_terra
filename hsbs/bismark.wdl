@@ -319,7 +319,7 @@ task merge_replicates {
     fi
     echo '...'
     ls
-    samtools sort -n -o ${samplename}.sorted.bam -O bam ${samplename}.bam 
+    samtools sort -o ${samplename}.sorted.bam -O bam ${samplename}.bam 
     echo '...'
     ls
     samtools index -b ${samplename}.sorted.bam ${samplename}.sorted.bai
