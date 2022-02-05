@@ -334,7 +334,7 @@ task merge_replicates {
     bedtools intersect -header -abam ${samplename}.bam -b ${target_region_bed} | samtools sort - | samtools view -@ 8 -F 0x08  - | samtools sort -o ${samplename}.intersect.bam -O bam -
     
     
-    bismark_methylation_extractor --multicore ${multicore} --gzip --bedGraph --buffer_size 50% --genome_folder bismark_index ${samplename}.bam 
+    bismark_methylation_extractor --multicore ${multicore} --gzip --bedGraph --buffer_size 50% --genome_folder bismark_index ${samplename}.intersect.bam 
     
 
     gunzip "${samplename}.bedGraph.gz"
