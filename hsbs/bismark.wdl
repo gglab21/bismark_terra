@@ -286,12 +286,11 @@ task merge_replicates {
     # How many reads per target?
     bedtools intersect -c -a ${target_region_bed} -b ${samplename}.bam > ${samplename}_target_coverage.bed
     
-    #bedtools intersect -abam ${samplename}.bam -b ${target_region_bed} > ${samplename}.intersect.bam
-    #rm ${samplename}.bam
-    #samtools sort -n -o ${samplename}.intersect.sorted.bam -O bam ${samplename}.intersect.bam
-    #rm ${samplename}.intersect.bam
-    #samtools view -@ 8 -F 0x08 -b ${samplename}.intersect.sorted.bam > ${samplename}.intersect.sorted.paired.bam
-    #samtools sort -n -o ${samplename}.bam -O bam ${samplename}.intersect.sorted.paired.bam
+    bedtools intersect -abam ${samplename}.bam -b ${target_region_bed} > ${samplename}.intersect.bam
+    rm ${samplename}.bam
+    samtools sort -n -o ${samplename}.bam -O bam ${samplename}.intersect.bam
+    rm ${samplename}.intersect.bam
+    
     
     # The file renaming below is necessary since this version of bismark doesn't allow the 
     # use of --multicore with --basename
@@ -323,10 +322,13 @@ task merge_replicates {
     else
         echo "Not deduplicating" | tee -a log.txt
     fi
-    
+    ls
     samtools sort -n -o ${samplename}.sorted.bam ${samplename}.bam
     samtools index ${samplename}.sorted.bam ${samplename}.sorted.bai
-              
+    
+    #samtools view -@ 8 -F 0x08 -b ${samplename}.intersect.sorted.bam > ${samplename}.intersect.sorted.paired.bam
+    #samtools sort -n -o ${samplename}.bam -O bam ${samplename}.intersect.sorted.paired.bam
+    
     bismark_methylation_extractor --multicore ${multicore} --gzip --bedGraph --buffer_size 50% --genome_folder bismark_index ${samplename}.bam
     
 
