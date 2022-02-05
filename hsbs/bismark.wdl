@@ -312,13 +312,13 @@ task merge_replicates {
         echo "Deduplicating..." | tee -a log.txt
         samtools sort -n -o ${samplename}.sorted_by_readname.bam ${samplename}.bam 
         deduplicate_bismark -p --bam ${samplename}.sorted_by_readname.bam
-        rm ${samplename}.sorted_by_readname.bam ${samplename}.bam
-        mv ${samplename}.sorted_by_readname.deduplicated.bam ${samplename}.bam
+        #rm ${samplename}.sorted_by_readname.bam ${samplename}.bam
+        #mv ${samplename}.sorted_by_readname.deduplicated.bam ${samplename}.bam
     else
         echo "Not deduplicating" | tee -a log.txt
     fi
     ls
-    samtools sort -n -o ${samplename}.sorted.bam ${samplename}.bam
+    samtools sort -n -o ${samplename}.sorted.bam ${samplename}.sorted_by_readname.deduplicated.bam 
     samtools index ${samplename}.sorted.bam ${samplename}.sorted.bai
     
     #bedtools intersect -abam ${samplename}.bam -b ${target_region_bed} > ${samplename}.intersect.bam
@@ -328,7 +328,7 @@ task merge_replicates {
     #samtools view -@ 8 -F 0x08 -b ${samplename}.intersect.sorted.bam > ${samplename}.intersect.sorted.paired.bam
     #samtools sort -n -o ${samplename}.bam -O bam ${samplename}.intersect.sorted.paired.bam
     
-    bismark_methylation_extractor --multicore ${multicore} --gzip --bedGraph --buffer_size 50% --genome_folder bismark_index ${samplename}.bam
+    bismark_methylation_extractor --multicore ${multicore} --gzip --bedGraph --buffer_size 50% --genome_folder bismark_index ${samplename}.sorted_by_readname.deduplicated.bam 
     
 
     gunzip "${samplename}.bedGraph.gz"
