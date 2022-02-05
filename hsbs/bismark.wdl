@@ -319,7 +319,7 @@ task merge_replicates {
     fi
     echo '...'
     ls
-    samtools sort -n -o ${samplename}.sorted.bam ${samplename}.sorted_by_readname.deduplicated.bam 
+    samtools sort -n -o ${samplename}.sorted.bam -O bam ${samplename}.sorted_by_readname.deduplicated.bam 
     samtools index ${samplename}.sorted.bam ${samplename}.sorted.bai
     
     #bedtools intersect -abam ${samplename}.bam -b ${target_region_bed} > ${samplename}.intersect.bam
