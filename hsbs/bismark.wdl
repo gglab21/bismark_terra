@@ -311,7 +311,7 @@ task merge_replicates {
     if [ "${assay_type}" == "hsbs" ] || [ "${assay_type}" == "HSBS" ]; then
         echo "Deduplicating..." | tee -a log.txt
         samtools sort -n -o ${samplename}.sorted_by_readname.bam ${samplename}.bam 
-        deduplicate_bismark -p --bam -o ${samplename}.sorted_by_readname.deduplicated.bam ${samplename}.sorted_by_readname.bam 
+        deduplicate_bismark -p --bam -o ${samplename}.sorted_by_readname ${samplename}.sorted_by_readname.bam 
         #rm ${samplename}.sorted_by_readname.bam ${samplename}.bam
         #mv ${samplename}.sorted_by_readname.deduplicated.bam ${samplename}.bam
     else
