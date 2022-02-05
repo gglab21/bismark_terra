@@ -325,13 +325,13 @@ task merge_replicates {
     samtools index -b ${samplename}.sorted.bam ${samplename}.sorted.bai
     
     #bedtools intersect -abam ${samplename}.bam -b ${target_region_bed} > ${samplename}.intersect.bam
-    rm ${samplename}.bam
+    #rm ${samplename}.bam
     #samtools sort -n -o ${samplename}.bam -O bam ${samplename}.intersect.bam
     #rm ${samplename}.intersect.bam
     #samtools view -@ 8 -F 0x08 -b ${samplename}.intersect.sorted.bam > ${samplename}.intersect.sorted.paired.bam
     #samtools sort -n -o ${samplename}.bam -O bam ${samplename}.intersect.sorted.paired.bam
     
-    bedtools intersect -abam ${samplename}.bam -b ${target_region_bed} | samtools sort -O bam - | samtools view -@ 8 -F 0x08 -b - | samtools sort -o ${samplename}.bam -O bam -
+    bedtools intersect -abam ${samplename}.bam -b ${target_region_bed} | samtools sort - | samtools view -@ 8 -F 0x08  - | samtools sort -o ${samplename}.bam -O bam -
     
     
     bismark_methylation_extractor --multicore ${multicore} --gzip --bedGraph --buffer_size 50% --genome_folder bismark_index ${samplename}.bam 
