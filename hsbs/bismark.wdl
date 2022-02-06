@@ -324,18 +324,10 @@ task merge_replicates {
     ls
     samtools index -b ${samplename}.sorted.bam ${samplename}.sorted.bai
     
-    #bedtools intersect -abam ${samplename}.bam -b ${target_region_bed} > ${samplename}.intersect.bam
-    #rm ${samplename}.bam
-    #samtools sort -n -o ${samplename}.bam -O bam ${samplename}.intersect.bam
-    #rm ${samplename}.intersect.bam
-    #samtools view -@ 8 -F 0x08 -b ${samplename}.intersect.sorted.bam > ${samplename}.intersect.sorted.paired.bam
-    #samtools sort -n -o ${samplename}.bam -O bam ${samplename}.intersect.sorted.paired.bam
-    #| samtools sort - 
-    #bedtools intersect -abam ${samplename}.bam -b ${target_region_bed} > ${samplename}.intersect.bam  #| samtools view -h -@ 8 -F 0x08 -O bam -o ${samplename}.intersect.bam - 
-    #| samtools sort -n -o ${samplename}.intersect.bam -O bam -
     bedtools pairtobed -abam ${samplename}.bam -b ${target_region_bed} | samtools view -h -@ 8 -F 0x08  - | samtools sort -n -o ${samplename}.i.bam -O bam -
-    
-    bismark_methylation_extractor --multicore ${multicore} --gzip --bedGraph --buffer_size 50% --genome_folder bismark_index ${samplename}.i.bam 
+    rm ${samplename}.bam
+    mv ${samplename}.i.bam ${samplename}.bam
+    bismark_methylation_extractor --multicore ${multicore} --gzip --bedGraph --buffer_size 50% --genome_folder bismark_index ${samplename}.bam 
     
 
     gunzip "${samplename}.bedGraph.gz"
