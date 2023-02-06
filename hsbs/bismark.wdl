@@ -78,6 +78,7 @@ workflow bsseq {
         String pipeline_version = version_info.pipeline_version
         String assay = assay_type
         File log = merge_replicates.log
+	File target_coverage_report = "${samplename}_target_coverage.bed"
   }
 
 }
@@ -324,10 +325,10 @@ task merge_replicates {
     ls
     samtools index -b ${samplename}.sorted.bam ${samplename}.sorted.bai
     
-    bedtools pairtobed -abam ${samplename}.bam -b ${target_region_bed} | samtools view -h -@ 8 -F 0x08  - | samtools sort -n -o ${samplename}.i.bam -O bam -
-    rm ${samplename}.bam
-    mv ${samplename}.i.bam ${samplename}.bam
-    bismark_methylation_extractor --multicore ${multicore} --gzip --bedGraph --buffer_size 50% --genome_folder bismark_index ${samplename}.bam 
+    #bedtools pairtobed -abam ${samplename}.bam -b ${target_region_bed} | samtools view -h -@ 8 -F 0x08  - | samtools sort -n -o ${samplename}.i.bam -O bam -
+    #rm ${samplename}.bam
+    #mv ${samplename}.i.bam ${samplename}.bam
+    bismark_methylation_extractor --multicore ${multicore} --gzip --bedGraph --buffer_size 50% --genome_folder bismark_index ${samplename}.sorted.bam 
     
 
     gunzip "${samplename}.bedGraph.gz"
