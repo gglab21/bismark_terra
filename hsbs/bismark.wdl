@@ -328,7 +328,7 @@ task merge_replicates {
     #bedtools pairtobed -abam ${samplename}.bam -b ${target_region_bed} | samtools view -h -@ 8 -F 0x08  - | samtools sort -n -o ${samplename}.i.bam -O bam -
     #rm ${samplename}.bam
     #mv ${samplename}.i.bam ${samplename}.bam
-    bismark_methylation_extractor --multicore ${multicore} --gzip --bedGraph --buffer_size 50% --genome_folder bismark_index ${samplename}.sorted.bam 
+    bismark_methylation_extractor --multicore ${multicore} --gzip --bedGraph --buffer_size 50% --genome_folder bismark_index ${samplename}.bam 
     
 
     gunzip "${samplename}.bedGraph.gz"
