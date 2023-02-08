@@ -169,8 +169,9 @@ task trim {
         trim_galore --paired --clip_R2 ${n_bp_trim_read2} r1.fastq.gz r2.fastq.gz
     else
         echo "  Not 5' trimming reads" | tee -a log.txt
-        cp r1.fastq.gz r1_val_1.fq.gz
-        cp r2.fastq.gz r2_val_2.fq.gz
+        trim_galore --paired --illumina --length 35 r1.fastq.gz r2.fastq.gz
+	#cp r1.fastq.gz r1_val_1.fq.gz
+        #cp r2.fastq.gz r2_val_2.fq.gz
     fi
   }
 
