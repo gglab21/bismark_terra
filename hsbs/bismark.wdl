@@ -47,7 +47,8 @@ workflow bsseq {
                             genome_index = genome_index,
                             samplename = samplename,
                             multicore = multicore,
-                            target_region_bed =target_region_bed,
+                            target_region_bed = target_region_bed,
+                            bismark_html = bismark_html,
                             monitoring_script = monitoring_script, memory = memory, disks = disks, cpu = cpu, preemptible = preemptible, image_id = image_id
         }
   }
