@@ -200,8 +200,6 @@ task align {
   File r1_fastq
   File r2_fastq
   File genome_index
-  File target_region_bed
-  File bismark_html
   File monitoring_script
   String samplename
 
