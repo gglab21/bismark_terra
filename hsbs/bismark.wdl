@@ -62,7 +62,7 @@ workflow bsseq {
                                 chrom_sizes = chrom_sizes,
                                 genome_index = genome_index,
                                 target_region_bed = target_region_bed,
-                                bismark_html = bismark_html,
+                                bismark_html = align.bismark_html,
                                 multicore = multicore,
                                 monitoring_script = monitoring_script, memory = memory, disks = disks, cpu = cpu, preemptible = preemptible, image_id = image_id
   }
