@@ -60,7 +60,8 @@ workflow bsseq {
                                 assay_type = assay_type,
                                 chrom_sizes = chrom_sizes,
                                 genome_index = genome_index,
-                                target_region_bed =target_region_bed,
+                                target_region_bed = target_region_bed,
+                                bismark_html = bismark_html,
                                 multicore = multicore,
                                 monitoring_script = monitoring_script, memory = memory, disks = disks, cpu = cpu, preemptible = preemptible, image_id = image_id
   }
@@ -80,7 +81,7 @@ workflow bsseq {
         String assay = assay_type
         File log = merge_replicates.log
         File target_coverage_report = merge_replicates.target_region_bed
-        File bismark_html = align.bismark_html
+        File bismark_html = merge_replicates.bismark_html
   }
 
 }
