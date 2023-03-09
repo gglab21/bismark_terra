@@ -364,6 +364,7 @@ task merge_replicates {
             File output_bai = "${samplename}.sorted.bai"
             File log = "log.txt"
             File target_coverage_report = "${samplename}_target_coverage.bed"
+            File bismark_report_html = "${samplename}_bismark_report.html"
 
   }
 
