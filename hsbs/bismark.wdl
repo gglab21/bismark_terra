@@ -12,7 +12,6 @@ workflow bsseq {
   File monitoring_script
   File chrom_sizes
   File target_region_bed
-  File bismark_html
   String samplename
   String assay_type
   Int n_bp_trim_read1 = 0
@@ -47,6 +46,7 @@ workflow bsseq {
                             genome_index = genome_index,
                             samplename = samplename,
                             multicore = multicore,
+			    target_region_bed =target_region_bed,
                             monitoring_script = monitoring_script, memory = memory, disks = disks, cpu = cpu, preemptible = preemptible, image_id = image_id
         }
   }
@@ -59,8 +59,7 @@ workflow bsseq {
                                 assay_type = assay_type,
                                 chrom_sizes = chrom_sizes,
                                 genome_index = genome_index,
-                                target_region_bed = target_region_bed,
-                                bismark_reports_html = align.bismark_html,
+				target_region_bed =target_region_bed,
                                 multicore = multicore,
                                 monitoring_script = monitoring_script, memory = memory, disks = disks, cpu = cpu, preemptible = preemptible, image_id = image_id
   }
@@ -79,8 +78,7 @@ workflow bsseq {
         String pipeline_version = version_info.pipeline_version
         String assay = assay_type
         File log = merge_replicates.log
-        File target_coverage_report = merge_replicates.target_region_bed
-        File bismark_report_html = merge_replicates.bismark_reports_html
+	File target_coverage_report = "${samplename}_target_coverage.bed"
   }
 
 }
@@ -200,6 +198,7 @@ task align {
   File r1_fastq
   File r2_fastq
   File genome_index
+  File target_region_bed
   File monitoring_script
   String samplename
 
@@ -247,7 +246,7 @@ task align {
   output {
     File bam = "${samplename}.bam"
     File output_report = "${samplename}_report.txt"
-    File bismark_html = "${samplename}_bismark_report.html"
+    File bismark_report_html = "${samplename}_bismark_report.html"
     File monitoring_log = "monitoring.log"
     File log = "log.txt"
   }
@@ -268,7 +267,6 @@ task merge_replicates {
   File chrom_sizes
   File genome_index
   File target_region_bed
-  File bismark_reports_html
 
   String memory
   String disks
@@ -360,8 +358,6 @@ task merge_replicates {
             File output_bai = "${samplename}.sorted.bai"
             File log = "log.txt"
             File target_coverage_report = "${samplename}_target_coverage.bed"
-            File bismark_report_html = "${samplename}_bismark_report.html"
-
   }
 
 }
