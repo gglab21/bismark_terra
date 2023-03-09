@@ -82,7 +82,7 @@ workflow bsseq {
         String assay = assay_type
         File log = merge_replicates.log
         File target_coverage_report = merge_replicates.target_region_bed
-        File bismark_html = merge_replicates.bismark_html
+        File bismark_report_html = merge_replicates.bismark_html
   }
 
 }
@@ -251,7 +251,7 @@ task align {
   output {
     File bam = "${samplename}.bam"
     File output_report = "${samplename}_report.txt"
-    File bismark_html = "${samplename}_bismark_report.html"
+    File bismark_report_html = "${samplename}_bismark_report.html"
     File monitoring_log = "monitoring.log"
     File log = "log.txt"
   }
@@ -364,7 +364,7 @@ task merge_replicates {
             File output_bai = "${samplename}.sorted.bai"
             File log = "log.txt"
             File target_coverage_report = "${samplename}_target_coverage.bed"
-            File bismark_html = "${samplename}_bismark_report.html"
+
   }
 
 }
