@@ -46,7 +46,7 @@ workflow bsseq {
                             genome_index = genome_index,
                             samplename = samplename,
                             multicore = multicore,
-			    target_region_bed =target_region_bed,
+                            target_region_bed =target_region_bed,
                             monitoring_script = monitoring_script, memory = memory, disks = disks, cpu = cpu, preemptible = preemptible, image_id = image_id
         }
   }
@@ -59,7 +59,7 @@ workflow bsseq {
                                 assay_type = assay_type,
                                 chrom_sizes = chrom_sizes,
                                 genome_index = genome_index,
-				target_region_bed =target_region_bed,
+                                target_region_bed =target_region_bed,
                                 multicore = multicore,
                                 monitoring_script = monitoring_script, memory = memory, disks = disks, cpu = cpu, preemptible = preemptible, image_id = image_id
   }
@@ -78,7 +78,8 @@ workflow bsseq {
         String pipeline_version = version_info.pipeline_version
         String assay = assay_type
         File log = merge_replicates.log
-	File target_coverage_report = "${samplename}_target_coverage.bed"
+	File bismark_report_html = merge_replicates.bismark_report_html
+        File target_coverage_report = merge_replicates.target_coverage_report
   }
 
 }
@@ -357,6 +358,7 @@ task merge_replicates {
             File output_bigwig = "${samplename}.bw"
             File output_bai = "${samplename}.sorted.bai"
             File log = "log.txt"
+            File bismark_report_html = "${samplename}_bismark_report.html"
             File target_coverage_report = "${samplename}_target_coverage.bed"
   }
 
