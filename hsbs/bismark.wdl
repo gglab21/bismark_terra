@@ -268,6 +268,7 @@ task merge_replicates {
   File chrom_sizes
   File genome_index
   File target_region_bed
+  File bismark_report_html
 
   String memory
   String disks
