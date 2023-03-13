@@ -360,7 +360,7 @@ task merge_replicates {
             File output_bigwig = "${samplename}.bw"
             File output_bai = "${samplename}.sorted.bai"
             File log = "log.txt"
-            File bismark_report_html = html
+            File bismark_report_html = "${samplename}_bismark_report.html"
             File target_coverage_report = "${samplename}_target_coverage.bed"
   }
 
