@@ -267,7 +267,6 @@ task merge_replicates {
   File chrom_sizes
   File genome_index
   File target_region_bed
-  File html
 
   String memory
   String disks
@@ -358,7 +357,6 @@ task merge_replicates {
             File output_bigwig = "${samplename}.bw"
             File output_bai = "${samplename}.sorted.bai"
             File log = "log.txt"
-            File html = "${samplename}_bismark_report.html"
             File target_coverage_report = "${samplename}_target_coverage.bed"
   }
 
